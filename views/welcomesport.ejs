@@ -1,0 +1,133 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="csrf-token" content="<%= csrfToken %>">
+      <title>Sports Scheduler</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link rel="stylesheet" href="/css/styles.css" />
+      <link href='https://fonts.googleapis.com/css?family=Alfa Slab One' rel='stylesheet'>
+      <style>
+
+nav{
+             display:flex;
+             background-color: rgb(23, 30, 43);
+             padding: 10px;
+             justify-content: space-between;
+        }
+        nav button {
+             margin: 0 10px; /* Add margin between buttons as needed */
+             padding: 6px 24px; /* Add padding to buttons as needed */
+             background-color: #3498db; /* Set the background color of the buttons */
+             color: white; /* Set the text color of the buttons */
+            border: none; /* Remove default button border */
+            border-radius: 4px; /* Add border-radius for rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */   
+            margin-left: 15px;
+            margin-right: 15px;
+        }
+        .b{
+            display: flex;
+            justify-content: space-between ;
+        }
+
+        /* Additional styling for button hover effect */
+        nav button:hover {
+        background-color: #2980b9; /* Change background color on hover */
+    }
+        .box-view {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #ffffff;
+          border: 1px solid #000000;
+          border-radius: 8px;
+        }
+      </style>
+      <script>
+        var token = document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content");
+    
+        function deleteSport(id) {
+          fetch(`/sports/${id}`, {
+            method: "delete",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              "_csrf": token
+            })
+          })
+            .then((res) => {
+              if (res.ok) {
+                window.location.replace('/WelcomeAdmin');
+              }
+            })
+            .catch((err) => console.error(err));
+        }
+      </script>
+    </head>
+    <body class="bg-blue-100">
+
+      <nav>
+        <div class="b">
+            <button ><a href="/welcomeadmin">Back</a></button>
+            <button> <a href="/about">About</a></button>
+        </div>
+        <div>
+            <h1 class="text-3xl mb-3 font-serif text-white">
+                Sports Scheduler Web Application
+              </h1>
+              
+        </div>
+        <div class="b">
+            <button><a href="/">Home</a></button>
+            <button> <a href="/signout" class="text-black font-bold text-2xl underline ">Signout</a></button>
+           
+        </div>
+       
+       
+    </nav>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="box-view bg-gray-100 p-8 rounded-lg shadow-lg" style="background-image: linear-gradient(rgb(234, 217, 217),rgb(211, 244, 247));">
+          <h1 class="text-center text-4xl my-8 font-style:font-serif  text-green-500">Session Management</h1>
+          <h1 class="text-center text-4xl my-4 text-green-700"><%= sport.sportname %></h1>
+        
+          <% if (loggedInAdmin === sport.adminid) { %>
+            <div class="flex justify-end px-4 py-2">
+              <div class="text-right">
+                <a href="/welcomeAdmin" onclick="deleteSport(<%= sport.id %>)" class="text-black-500 underline">Delete Sport</a><img style="width: 25px ;height : 25px;display: inline; margin-left: 3px;" src="/images/delete.jpg">
+              </div>
+              <div class="text-right ml-4">
+                <a href="/Editsport/<%= sport.id %>" class="text-black-500 underline">Edit Sport</a> <img style="width: 25px ;height : 25px;display: inline; margin-left: 3px;" src="/images/edit.jpg">
+              </div>
+            </div>
+          <% } %>
+        
+          <div class="text-center my-4">
+            
+            <span>Create a new Session</span><a href="/sports1/<%= sportid %>" class="text-black-500 underline"><img style="width: 25px ;height : 25px;display: inline; margin-left: 3px;" src="/images/add.jpg"></a> 
+          </div>
+        
+          <div class="text-center my-8">
+            <h1 class="text-4xl text-green-500">View Sessions</h1>
+          </div>
+        
+          <div class="text-center my-4">
+            <a href="/sessionviewyou/<%= sportid %>" class="text-black-500 underline">View your sessions</a><img style="width: 35px ;height : 35px;display: inline;" src="/images/left-click.png" >
+            <br>
+            <a href="/sessionviewothers/<%= sportid %>" class="text-black-500 underline">View Sessions created by others</a><img style="width: 35px ;height : 35px;display: inline;" src="/images/left-click.png" >
+          </div>
+        </div>
+        
+      
+    </body>
+    </html>
+    
+</body>
+</html>

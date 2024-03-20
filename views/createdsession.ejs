@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Sports Scheduler</title>
+    <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
+      
+        function deletePlayer(id) {
+            fetch(`/deleteplayer/${id}`, {
+                method: "delete",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token
+                })
+            })
+                .then((res) => {
+                    if (res.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch((err) => console.error(err));
+        }
+      
+        function joinSession(id) {
+            var sessionDate = new Date("<%= session.date %>");
+            var today = new Date();
+      
+            if (sessionDate >= today) {
+                fetch(`/joinsession/${id}`, {
+                    method: "post",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        "_csrf": token
+                    })
+                })
+                    .then((res) => {
+                        if (res.ok) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch((err) => console.error(err));
+            }
+        }
+      
+        function Leavesession(id) {
+            fetch(`/leavesession/${id}`, {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token
+                })
+            })
+                .then((res) => {
+                    if (res.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch((err) => console.error(err));
+        }
+      </script>
+      <style>
+                nav{
+             display:flex;
+             background-color: rgb(23, 30, 43);
+             padding: 10px;
+             justify-content: space-between;
+        }
+        nav button {
+             margin: 0 10px; /* Add margin between buttons as needed */
+             padding: 6px 24px; /* Add padding to buttons as needed */
+             background-color: #3498db; /* Set the background color of the buttons */
+             color: white; /* Set the text color of the buttons */
+            border: none; /* Remove default button border */
+            border-radius: 4px; /* Add border-radius for rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */   
+            margin-left: 15px;
+            margin-right: 15px;
+        }
+        .b{
+            display: flex;
+            justify-content: space-between ;
+        }
+
+        /* Additional styling for button hover effect */
+        nav button:hover {
+        background-color: #2980b9; /* Change background color on hover */
+    }
+      </style>
+
+</head>
+
+<body class="bg-blue-100">
+  
+  <nav>
+    <div class="b">
+        <button >Home</button>
+        <button> <a href="/about">About</a></button>
+    </div>
+    <div>
+        <h1 class="text-3xl mb-3 font-serif text-white">
+            Sports Scheduler Web Application
+          </h1>
+          
+    </div>
+    <div class="b">
+        <button><a href="/welcomeAdmin">Back</a></button>
+        <button><a href="/signout">Signout</a></button>
+       
+    </div>
+   
+   
+</nav>
+        
+   
+        <div class="p-4 bg-red-50 mt-4">
+            <h1 class="text-xl mb-4 text-center text-red-900"><%= sport.sportname %> session#<%= session.id%></h1>
+            <p class="border border-gray-300 rounded p-4">
+                This session is scheduled for <%= session.date %> and will be played at <%= session.venue %>.
+            </p>
+            <h1 class="mt-4 text-4xl">Players </h1>
+            <div>
+              
+                
+                <% if (session.adminId === adminId || session.playerId === playerId) { %>
+                    <% for (var i = 0; i < players.length; i++) { %>
+                        <div class="flex items-center bg-blue-500 p-2 rounded">
+                            <p class="text-white"><%= players[i].playername %></p>
+                            <a class="trash-icon ml-2" href="" onclick="deletePlayer(<%=players[i].id%>)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>                          
+                            </a>
+                        </div>
+                        
+
+                    
+                    <% } %>
+                <% } %>
+            
+                <% if (session.playerId !== playerId && session.adminId !== adminId) { %>
+                    <% for (var i = 0; i < players.length; i++) { %>
+                        <div class="flex items-center bg-blue-500 p-2 rounded">
+                            <p class="text-white"><%= players[i].playername %></p>
+                        </div>
+                    <% } %>
+                <% } %>
+            </div>
+            <div class="adminid mt-3 flex gap-4">
+                
+               <% if(players.some(players=>players.adminId === adminId  )||players.some(players=>players.playerId === playerId  ) ) {%>
+
+                <a href="#" onclick="Leavesession(<%=session.id%>)" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                    </svg>
+                    <p class="ml-2 text-sky-900">Leavesession</p>
+                </a>
+                <% } else {%>
+                
+
+                
+                <a href="#" onclick="joinSession(<%=session.id%>)" class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                        </svg>
+                        <p class="ml-2 text-sky-900">Join Session</p>
+                    </a>
+               <% } %>
+                <% if (session.adminId === adminId) { %>
+                  <a href="/editsession/<%= session.id %>" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-sky-900">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                    </svg>
+                    <p class="text-sky-900">Edit Session</p>
+                  </a>
+                  <a href="/deletesession/<%= session.id %>" class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-black-900">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <p class="text-sky-900">Cancel Session</p>
+                  </a>
+                <% } %>
+               
+              </div>
+              
+            
+</body>
+</html>
